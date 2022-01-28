@@ -42,10 +42,7 @@ class MusicPlayer(object):
         )
 
     async def send_playlist(self):
-        playlist = self.playlist
-        if not playlist:
-            pl = f"{emoji.NO_ENTRY} empty playlist"
-        else:
+        if playlist := self.playlist:
             if len(playlist) == 1:
                 pl = f"{emoji.REPEAT_SINGLE_BUTTON} **Playlist**:\n"
             else:
@@ -54,6 +51,8 @@ class MusicPlayer(object):
                 f"**{i}**. **[{x.audio.title}]({x.link})**"
                 for i, x in enumerate(playlist)
             ])
+        else:
+            pl = f"{emoji.NO_ENTRY} empty playlist"
         if self.msg.get('playlist') is not None:
             await self.msg['playlist'].delete()
         self.msg['playlist'] = await self.send_text(pl)

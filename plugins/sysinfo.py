@@ -34,12 +34,9 @@ self_or_contact_filter = filters.create(
 
 async def generate_sysinfo(workdir):
     # uptime
-    info = {}
-    info['boot'] = (
-        datetime
+    info = {'boot': datetime
         .fromtimestamp(psutil.boot_time())
-        .strftime("%Y-%m-%d %H:%M:%S")
-    )
+        .strftime("%Y-%m-%d %H:%M:%S")}
     # CPU
     cpu_freq = psutil.cpu_freq().current
     if cpu_freq >= 1000:
@@ -69,9 +66,7 @@ async def generate_sysinfo(workdir):
     nio = psutil.net_io_counters()
     info['net io'] = (f"TX {bytes2human(nio.bytes_sent)} | "
                       f"RX {bytes2human(nio.bytes_recv)}")
-    # Sensors
-    sensors_temperatures = psutil.sensors_temperatures()
-    if sensors_temperatures:
+    if sensors_temperatures := psutil.sensors_temperatures():
         temperatures_list = [
             x.current
             for x in sensors_temperatures['coretemp']
@@ -85,16 +80,6 @@ async def generate_sysinfo(workdir):
         + "\n".join([f"{x:<{max_len}} {y}" for x, y in info.items()])
         + "```"
     )
-    """
-    partition_info = []
-    for part in psutil.disk_partitions():
-        mp = part.mountpoint
-        du = psutil.disk_usage(mp)
-        partition_info.append(f"{part.device} {mp} "
-                              f"{part.fstype} "
-                              f"{du.used} / {du.total} {du.percent}")
-    partition_info = ",".join(partition_info)
-    """
 
 
 @Client.on_message(filters.group
